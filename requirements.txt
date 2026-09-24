@@ -1,0 +1,36 @@
+# ╔══════════════════════════════════════════════════════════════════════╗
+# ║         AI Impact on Students — Project Dependencies                ║
+# ║         IBM SkillsBuild Data Analytics with AI Internship           ║
+# ║         Author: Dharamveer Sharma  |  BharatCares × AICTE           ║
+# ╚══════════════════════════════════════════════════════════════════════╝
+#
+# Install all dependencies with:
+#   pip install -r requirements.txt
+#
+# Or inside the notebook run Step 0 (auto-installs on first run).
+# ──────────────────────────────────────────────────────────────────────
+
+# ── Core Data Science ─────────────────────────────────────────────────
+pandas>=2.0.0          # DataFrame operations, CSV I/O, groupby, pivot
+numpy>=1.24.0          # Numerical arrays, polyfit, random seed
+
+# ── Machine Learning ──────────────────────────────────────────────────
+scikit-learn>=1.5.0    # RandomForest, LogisticRegression, metrics, CV
+                       # Note: multi_class param removed in v1.5 — handled
+
+# ── Visualisation — Static ────────────────────────────────────────────
+matplotlib>=3.7.0      # Base plotting engine (saved PNGs at 160 dpi)
+seaborn>=0.12.0        # heatmap, boxplot, violinplot, histplot, KDE
+
+# ── Visualisation — Interactive ───────────────────────────────────────
+plotly>=5.18.0         # Interactive scatter chart (Step 6.6)
+ipywidgets>=8.0.0      # Dataset Explorer (Step 6.7) + Predictor (Step 7.8)
+
+# ── Jupyter Environment ───────────────────────────────────────────────
+jupyter>=1.0.0         # Meta-package (installs notebook + lab)
+notebook>=7.0.0        # Classic Jupyter Notebook server
+ipykernel>=6.25.0      # Python kernel for Jupyter
+
+# ──────────────────────────────────────────────────────────────────────
+# Tested on: Python 3.13  |  Windows 10/11  |  64-bit
+# ──────────────────────────────────────────────────────────────────────

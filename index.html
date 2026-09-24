@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Impact on Students | IBM SkillsBuild Project</title>
+<meta name="description" content="Data Analytics & Machine Learning project analyzing how Generative AI tools affect student academic outcomes, GPA changes, and burnout risk.">
+<meta property="og:title" content="AI Impact on Students — IBM SkillsBuild">
+<meta property="og:description" content="Analyzing how GenAI tools, study hours, AI dependency, and prompt skills affect student GPA and burnout risk across 50,000 students.">
+<meta property="og:type" content="website">
+<style>
+  /* ── Reset & Base ───────────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy:    #0f3460;
+    --red:     #e94560;
+    --dark:    #1a1a2e;
+    --mid:     #16213e;
+    --white:   #ffffff;
+    --offwhite:#f0f4ff;
+    --muted:   #6b7280;
+    --border:  #e5e7eb;
+    --green:   #27ae60;
+    --orange:  #e67e22;
+    --crimson: #c0392b;
+    --card-bg: #ffffff;
+    --shadow:  0 4px 20px rgba(15,52,96,.10);
+    --radius:  12px;
+    --font:    'Segoe UI', system-ui, -apple-system, sans-serif;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--font);
+    color: #1f2328;
+    background: var(--offwhite);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+  a { color: var(--navy); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  img { max-width: 100%; height: auto; display: block; border-radius: 8px; }
+
+  /* ── Layout ─────────────────────────────────────────────────────────── */
+  .container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  section { padding: 64px 0; }
+  section:nth-child(even) { background: #fff; }
+
+  /* ── Nav ────────────────────────────────────────────────────────────── */
+  nav {
+    background: var(--dark);
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,.35);
+  }
+  .nav-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px; max-width: 1080px; margin: 0 auto; height: 58px;
+  }
+  .nav-brand {
+    color: #fff; font-weight: 800; font-size: 15px; letter-spacing: .4px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .nav-brand .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--red); }
+  .nav-links { display: flex; gap: 6px; flex-wrap: wrap; }
+  .nav-links a {
+    color: #c9d1d9; font-size: 13px; padding: 5px 12px; border-radius: 6px;
+    transition: background .2s, color .2s;
+  }
+  .nav-links a:hover { background: rgba(255,255,255,.1); color: #fff; text-decoration: none; }
+
+  /* ── Hero ───────────────────────────────────────────────────────────── */
+  #hero {
+    background: linear-gradient(135deg, var(--dark) 0%, var(--mid) 55%, var(--navy) 100%);
+    color: #fff; padding: 80px 0 72px; text-align: center;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+    border-radius: 99px; padding: 5px 16px; font-size: 12px;
+    color: #a8b2d8; letter-spacing: .5px; text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  #hero h1 {
+    font-size: clamp(28px, 5vw, 48px); font-weight: 900;
+    letter-spacing: -1px; line-height: 1.15; margin-bottom: 18px;
+  }
+  #hero h1 span { color: var(--red); }
+  #hero .subtitle {
+    font-size: 16px; color: #a8b2d8; max-width: 580px;
+    margin: 0 auto 36px;
+  }
+  .hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 28px; border-radius: 8px; font-weight: 700;
+    font-size: 14px; cursor: pointer; transition: transform .15s, box-shadow .15s;
+    border: none;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.25); text-decoration: none; }
+  .btn-primary { background: var(--red); color: #fff; }
+  .btn-outline { background: transparent; color: #fff; border: 2px solid rgba(255,255,255,.4); }
+  .btn-outline:hover { border-color: #fff; background: rgba(255,255,255,.08); }
+  .hero-stats {
+    display: flex; gap: 0; justify-content: center; margin-top: 52px;
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12);
+    border-radius: 12px; max-width: 680px; margin-left: auto; margin-right: auto;
+    overflow: hidden;
+  }
+  .hero-stat {
+    flex: 1; padding: 22px 16px; text-align: center;
+    border-right: 1px solid rgba(255,255,255,.1);
+  }
+  .hero-stat:last-child { border-right: none; }
+  .hero-stat .num { font-size: 26px; font-weight: 900; color: #fff; }
+  .hero-stat .lbl { font-size: 11px; color: #a8b2d8; text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
+
+  /* ── Section headings ───────────────────────────────────────────────── */
+  .section-title {
+    font-size: 26px; font-weight: 800; color: var(--navy);
+    margin-bottom: 8px; letter-spacing: -.3px;
+  }
+  .section-sub { color: var(--muted); font-size: 14px; margin-bottom: 36px; }
+  .section-title span { color: var(--red); }
+
+  /* ── Badges ─────────────────────────────────────────────────────────── */
+  .badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 12px; border-radius: 99px; font-size: 12px; font-weight: 600;
+    border: 1px solid;
+  }
+  .badge-blue   { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+  .badge-orange { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
+  .badge-green  { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
+  .badge-purple { background: #faf5ff; color: #7e22ce; border-color: #e9d5ff; }
+  .badge-gray   { background: #f9fafb; color: #374151; border-color: #e5e7eb; }
+
+  /* ── Cards ──────────────────────────────────────────────────────────── */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap: 20px; }
+  .card {
+    background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 24px;
+    box-shadow: var(--shadow); transition: transform .2s, box-shadow .2s;
+  }
+  .card:hover { transform: translateY(-4px); box-shadow: 0 8px 32px rgba(15,52,96,.14); }
+  .card-icon { font-size: 28px; margin-bottom: 12px; }
+  .card h3 { font-size: 15px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+  .card p  { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .card .stat-big { font-size: 32px; font-weight: 900; color: var(--red); margin: 8px 0 4px; }
+
+  /* ── Tables ─────────────────────────────────────────────────────────── */
+  .tbl-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  th {
+    background: var(--navy); color: #fff; padding: 12px 16px;
+    text-align: left; font-weight: 700; font-size: 12px;
+    text-transform: uppercase; letter-spacing: .5px;
+  }
+  td { padding: 11px 16px; border-bottom: 1px solid var(--border); color: #374151; }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: #f9fafb; }
+  tr:hover td { background: #eff6ff; }
+  .tag {
+    display: inline-block; padding: 2px 8px; border-radius: 4px;
+    font-size: 11px; font-weight: 600;
+  }
+  .tag-low    { background: #dcfce7; color: #15803d; }
+  .tag-med    { background: #fef3c7; color: #92400e; }
+  .tag-high   { background: #fee2e2; color: #b91c1c; }
+  .tag-blue   { background: #dbeafe; color: #1d4ed8; }
+
+  /* ── Plots grid ─────────────────────────────────────────────────────── */
+  .plots-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(300px,1fr)); gap: 24px; }
+  .plot-card {
+    background: #fff; border: 1px solid var(--border); border-radius: var(--radius);
+    overflow: hidden; box-shadow: var(--shadow);
+    transition: transform .2s, box-shadow .2s;
+    cursor: pointer;
+  }
+  .plot-card:hover { transform: translateY(-4px); box-shadow: 0 10px 36px rgba(15,52,96,.16); }
+  .plot-card img { width: 100%; object-fit: cover; }
+  .plot-card .plot-info { padding: 14px 16px; }
+  .plot-card .plot-num { font-size: 11px; color: var(--red); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+  .plot-card .plot-title { font-size: 14px; font-weight: 700; color: var(--navy); margin: 3px 0; }
+  .plot-card .plot-desc  { font-size: 12px; color: var(--muted); }
+
+  /* ── Pipeline ───────────────────────────────────────────────────────── */
+  .pipeline { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin: 32px 0; }
+  .step-box {
+    background: var(--card-bg); border: 2px solid var(--border);
+    border-radius: 10px; padding: 14px 18px; min-width: 110px; text-align: center;
+    flex: 1;
+  }
+  .step-box.active { border-color: var(--red); background: #fff0f3; }
+  .step-box .step-num { font-size: 10px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+  .step-box .step-label { font-size: 13px; font-weight: 700; color: var(--navy); margin-top: 4px; }
+  .step-arrow { color: var(--muted); font-size: 18px; flex-shrink: 0; }
+
+  /* ── Model results ──────────────────────────────────────────────────── */
+  .model-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  @media(max-width:600px){ .model-grid { grid-template-columns: 1fr; } }
+  .model-card {
+    border-radius: 10px; padding: 20px; text-align: center;
+    border: 2px solid transparent;
+  }
+  .model-card.best { border-color: var(--green); background: #f0fdf4; }
+  .model-card.base { border-color: var(--border); background: #f9fafb; }
+  .model-card.lr   { border-color: var(--border); background: #fff; }
+  .model-card .mc-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
+  .model-card .mc-name  { font-size: 16px; font-weight: 800; color: var(--navy); margin: 6px 0; }
+  .model-card .mc-acc   { font-size: 36px; font-weight: 900; }
+  .mc-acc.green  { color: var(--green); }
+  .mc-acc.blue   { color: #2980b9; }
+  .mc-acc.gray   { color: #9ca3af; }
+  .model-card .mc-note  { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .progress-bar-wrap { height: 8px; background: #e5e7eb; border-radius: 99px; margin-top: 12px; overflow: hidden; }
+  .progress-bar { height: 100%; border-radius: 99px; transition: width 1s ease; }
+
+  /* ── Features ───────────────────────────────────────────────────────── */
+  .feat-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 16px; }
+  .feat-pill {
+    background: #fff; border: 1px solid var(--border); border-radius: 10px;
+    padding: 16px; display: flex; align-items: flex-start; gap: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.04);
+  }
+  .feat-icon { font-size: 22px; flex-shrink: 0; }
+  .feat-name { font-size: 13px; font-weight: 700; color: var(--navy); }
+  .feat-formula { font-size: 11px; color: var(--muted); font-family: monospace; margin-top: 3px; }
+
+  /* ── Insights ───────────────────────────────────────────────────────── */
+  .insight-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap: 20px; }
+  .insight-card {
+    background: #fff; border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 22px; border-left: 5px solid var(--navy); box-shadow: var(--shadow);
+  }
+  .insight-card.red    { border-left-color: var(--red); }
+  .insight-card.green  { border-left-color: var(--green); }
+  .insight-card.orange { border-left-color: var(--orange); }
+  .insight-card .i-emoji { font-size: 24px; margin-bottom: 8px; }
+  .insight-card .i-title { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+  .insight-card .i-val   { font-size: 22px; font-weight: 900; color: var(--red); margin-bottom: 6px; }
+  .insight-card .i-desc  { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  /* ── Ethics ─────────────────────────────────────────────────────────── */
+  .ethics-list { display: flex; flex-direction: column; gap: 14px; }
+  .ethics-item {
+    display: flex; gap: 16px; align-items: flex-start;
+    background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.04);
+  }
+  .ethics-item .e-num {
+    width: 32px; height: 32px; border-radius: 50%; background: var(--navy);
+    color: #fff; font-weight: 800; font-size: 13px; display: flex;
+    align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .ethics-item .e-title { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+  .ethics-item .e-desc  { font-size: 13px; color: var(--muted); }
+
+  /* ── Footer ─────────────────────────────────────────────────────────── */
+  footer {
+    background: var(--dark); color: #8b949e;
+    text-align: center; padding: 36px 24px; font-size: 13px;
+  }
+  footer strong { color: #fff; }
+  footer .footer-links { display: flex; gap: 20px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
+  footer .footer-links a { color: #8b949e; font-size: 12px; }
+  footer .footer-links a:hover { color: #fff; }
+
+  /* ── Lightbox ───────────────────────────────────────────────────────── */
+  #lightbox {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,.85);
+    z-index: 9999; align-items: center; justify-content: center; cursor: zoom-out;
+  }
+  #lightbox.open { display: flex; }
+  #lightbox img  { max-width: 92vw; max-height: 88vh; border-radius: 8px; cursor: default; }
+
+  /* ── Responsive ─────────────────────────────────────────────────────── */
+  @media(max-width:680px){
+    .hero-stats { flex-wrap: wrap; }
+    .hero-stat  { flex: 0 0 50%; border-bottom: 1px solid rgba(255,255,255,.1); }
+    .pipeline   { flex-direction: column; align-items: stretch; }
+    .step-arrow { transform: rotate(90deg); align-self: center; }
+    .nav-links  { display: none; }
+  }
+
+  /* ── Scroll animations ──────────────────────────────────────────────── */
+  .fade-in { opacity: 0; transform: translateY(20px); transition: opacity .6s ease, transform .6s ease; }
+  .fade-in.visible { opacity: 1; transform: none; }
+</style>
+</head>
+<body>
+
+<!-- ── NAV ─────────────────────────────────────────────────────────────── -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-brand">
+      <div class="dot"></div>
+      AI Impact on Students
+    </div>
+    <div class="nav-links">
+      <a href="#overview">Overview</a>
+      <a href="#dataset">Dataset</a>
+      <a href="#pipeline">Pipeline</a>
+      <a href="#plots">Visualizations</a>
+      <a href="#models">ML Models</a>
+      <a href="#insights">Insights</a>
+      <a href="#ethics">Ethics</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── HERO ────────────────────────────────────────────────────────────── -->
+<section id="hero">
+  <div class="container">
+    <div class="hero-badge">
+      <span>🏫</span> IBM SkillsBuild · BharatCares × AICTE Internship
+    </div>
+    <h1>AI Impact on<br><span>Students</span></h1>
+    <p class="subtitle">
+      Analyzing how Generative AI tools, study habits, AI dependency, and prompt engineering
+      skills affect student academic outcomes, GPA changes, and burnout risk.
+    </p>
+    <div class="hero-btns">
+      <a href="https://github.com/DharamveerSharma/IBM_Skillbuild_project" class="btn btn-primary" target="_blank">
+        ⭐ View on GitHub
+      </a>
+      <a href="DharamveerSharma_AI_Impact_Students.ipynb" class="btn btn-outline" download>
+        📓 Download Notebook
+      </a>
+      <a href="DharamveerSharma_ProjectReport.docx" class="btn btn-outline" download>
+        📄 Project Report
+      </a>
+    </div>
+    <div class="hero-stats fade-in">
+      <div class="hero-stat">
+        <div class="num">50,000</div>
+        <div class="lbl">Student Records</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">16</div>
+        <div class="lbl">Features</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">7</div>
+        <div class="lbl">Visualizations</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">51.9%</div>
+        <div class="lbl">RF Accuracy</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">+9.6pp</div>
+        <div class="lbl">Above Baseline</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── OVERVIEW ─────────────────────────────────────────────────────────── -->
+<section id="overview">
+  <div class="container">
+    <h2 class="section-title fade-in">Project <span>Overview</span></h2>
+    <p class="section-sub fade-in">Author: <strong>Dharamveer Sharma</strong> &nbsp;|&nbsp; IBM SkillsBuild Data Analytics with AI Academic Internship</p>
+
+    <div class="badges fade-in">
+      <span class="badge badge-blue">🐍 Python 3.13+</span>
+      <span class="badge badge-orange">📓 Jupyter Notebook</span>
+      <span class="badge badge-green">🌲 scikit-learn 1.5+</span>
+      <span class="badge badge-purple">📉 Plotly Interactive</span>
+      <span class="badge badge-purple">🎛️ ipywidgets</span>
+      <span class="badge badge-blue">🐼 Pandas 2.0+</span>
+      <span class="badge badge-orange">🎨 Seaborn</span>
+      <span class="badge badge-gray">📊 Matplotlib</span>
+    </div>
+
+    <div class="cards fade-in">
+      <div class="card">
+        <div class="card-icon">📈</div>
+        <h3>GPA Impact Analysis</h3>
+        <p>Does more GenAI usage improve or harm semester GPA? We track GPA change across 50k students stratified by burnout risk.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🤖</div>
+        <h3>AI Dependency Risk</h3>
+        <p>Measures how perceived over-reliance on AI tools correlates with skill retention scores and academic outcomes.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🧠</div>
+        <h3>Prompt Skill Effect</h3>
+        <p>Advanced prompt engineers show lower high-burnout rates — skill quality mediates AI's impact on student welfare.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🏫</div>
+        <h3>Policy Analysis</h3>
+        <p>Which institutional policy — strict ban, citation-required, or actively encouraged — produces the best outcomes?</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔥</div>
+        <h3>Burnout Prediction</h3>
+        <p>Random Forest classifier trained to predict student burnout risk (Low / Medium / High) from behavioral features.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎛️</div>
+        <h3>Live Predictor Widget</h3>
+        <p>Interactive ipywidgets burnout predictor inside the notebook — adjust 12 controls for instant ML predictions.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── DATASET ──────────────────────────────────────────────────────────── -->
+<section id="dataset">
+  <div class="container">
+    <h2 class="section-title fade-in">Dataset <span>Description</span></h2>
+    <p class="section-sub fade-in">Source: <a href="https://www.kaggle.com/datasets" target="_blank">AI Impact on Students — Kaggle</a> &nbsp;·&nbsp; 50,000 records &nbsp;·&nbsp; No missing values</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:36px" class="fade-in">
+      <div class="card" style="border-left:5px solid var(--navy)">
+        <div class="card-icon">📊</div>
+        <h3>Dataset Statistics</h3>
+        <div class="stat-big">50,000</div>
+        <p>Total student records across 5 major categories and 5 academic year levels</p>
+      </div>
+      <div class="card" style="border-left:5px solid var(--red)">
+        <div class="card-icon">🎯</div>
+        <h3>Target Distribution</h3>
+        <div style="margin-top:12px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <span class="tag tag-low">Low</span>
+            <div style="flex:1;height:12px;background:#e5e7eb;border-radius:99px;overflow:hidden">
+              <div style="width:32.7%;height:100%;background:var(--green);border-radius:99px"></div>
+            </div>
+            <span style="font-size:12px;font-weight:700;min-width:44px">32.7%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <span class="tag tag-med">Med</span>
+            <div style="flex:1;height:12px;background:#e5e7eb;border-radius:99px;overflow:hidden">
+              <div style="width:42.3%;height:100%;background:var(--orange);border-radius:99px"></div>
+            </div>
+            <span style="font-size:12px;font-weight:700;min-width:44px">42.3%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="tag tag-high">High</span>
+            <div style="flex:1;height:12px;background:#e5e7eb;border-radius:99px;overflow:hidden">
+              <div style="width:25%;height:100%;background:var(--crimson);border-radius:99px"></div>
+            </div>
+            <span style="font-size:12px;font-weight:700;min-width:44px">25.0%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tbl-wrap fade-in">
+      <table>
+        <thead><tr><th>Feature</th><th>Type</th><th>Range / Values</th><th>Group</th></tr></thead>
+        <tbody>
+          <tr><td><code>Major_Category</code></td><td>Categorical</td><td>STEM · Humanities · Business · Arts · Medical</td><td><span class="tag tag-blue">Contextual</span></td></tr>
+          <tr><td><code>Year_of_Study</code></td><td>Ordinal</td><td>Freshman → Sophomore → Junior → Senior → Graduate</td><td><span class="tag tag-blue">Contextual</span></td></tr>
+          <tr><td><code>Pre / Post Semester GPA</code></td><td>Float</td><td>0.0 – 4.0</td><td><span class="tag tag-low">Academic</span></td></tr>
+          <tr><td><code>Weekly_GenAI_Hours</code></td><td>Float</td><td>0 – 40 hrs/week</td><td><span class="tag tag-med">AI Usage</span></td></tr>
+          <tr><td><code>Perceived_AI_Dependency</code></td><td>Integer</td><td>1 – 10 scale</td><td><span class="tag tag-med">AI Usage</span></td></tr>
+          <tr><td><code>Prompt_Engineering_Skill</code></td><td>Ordinal</td><td>Beginner · Intermediate · Advanced</td><td><span class="tag tag-med">AI Usage</span></td></tr>
+          <tr><td><code>Skill_Retention_Score</code></td><td>Float</td><td>0 – 100</td><td><span class="tag tag-low">Academic</span></td></tr>
+          <tr><td><code>Institutional_Policy</code></td><td>Categorical</td><td>Strict_Ban · Allowed_With_Citation · Actively_Encouraged</td><td><span class="tag tag-blue">Contextual</span></td></tr>
+          <tr><td><code>Burnout_Risk_Level</code></td><td><strong>Target</strong></td><td>Low · Medium · High</td><td><span class="tag tag-high">Target</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ── PIPELINE ─────────────────────────────────────────────────────────── -->
+<section id="pipeline">
+  <div class="container">
+    <h2 class="section-title fade-in">Project <span>Pipeline</span></h2>
+    <p class="section-sub fade-in">9-step end-to-end workflow from raw data to interactive ML predictor</p>
+
+    <div class="pipeline fade-in">
+      <div class="step-box"><div class="step-num">Step 0</div><div class="step-label">⚙️ Install Deps</div></div>
+      <div class="step-arrow">→</div>
+      <div class="step-box"><div class="step-num">Step 1</div><div class="step-label">📦 Imports</div></div>
+      <div class="step-arrow">→</div>
+      <div class="step-box"><div class="step-num">Steps 2–4</div><div class="step-label">🔍 Load & Clean</div></div>
+      <div class="step-arrow">→</div>
+      <div class="step-box active"><div class="step-num">Step 5</div><div class="step-label">🔧 Feature Eng.</div></div>
+      <div class="step-arrow">→</div>
+      <div class="step-box active"><div class="step-num">Step 6</div><div class="step-label">📊 EDA + Plots</div></div>
+      <div class="step-arrow">→</div>
+      <div class="step-box active"><div class="step-num">Step 7</div><div class="step-label">🌲 ML Models</div></div>
+      <div class="step-arrow">→</div>
+      <div class="step-box"><div class="step-num">Steps 8–9</div><div class="step-label">💡 Insights</div></div>
+    </div>
+
+    <h3 style="font-size:16px;font-weight:700;color:var(--navy);margin:36px 0 16px" class="fade-in">5 Engineered Features</h3>
+    <div class="feat-grid fade-in">
+      <div class="feat-pill"><div class="feat-icon">📈</div><div><div class="feat-name">GPA Change</div><div class="feat-formula">Post_GPA − Pre_GPA</div></div></div>
+      <div class="feat-pill"><div class="feat-icon">⚖️</div><div><div class="feat-name">AI Study Ratio</div><div class="feat-formula">GenAI_hrs ÷ (GenAI + Study + ε)</div></div></div>
+      <div class="feat-pill"><div class="feat-icon">📐</div><div><div class="feat-name">Skill Efficiency</div><div class="feat-formula">Skill_Retention ÷ (GenAI + 1)</div></div></div>
+      <div class="feat-pill"><div class="feat-icon">🚩</div><div><div class="feat-name">High AI Dependency</div><div class="feat-formula">1 if Dependency ≥ 5</div></div></div>
+      <div class="feat-pill"><div class="feat-icon">🔢</div><div><div class="feat-name">Prompt Skill Numeric</div><div class="feat-formula">Beginner=1, Intermediate=2, Advanced=3</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PLOTS ────────────────────────────────────────────────────────────── -->
+<section id="plots">
+  <div class="container">
+    <h2 class="section-title fade-in">EDA <span>Visualizations</span></h2>
+    <p class="section-sub fade-in">7 publication-quality plots generated from 50,000 real data points · Click any plot to enlarge</p>
+
+    <div class="plots-grid fade-in">
+      <div class="plot-card" onclick="openLightbox('assets/plot_gpa_change.png')">
+        <img src="assets/plot_gpa_change.png" alt="GPA Change Distribution" loading="lazy">
+        <div class="plot-info">
+          <div class="plot-num">Plot 1</div>
+          <div class="plot-title">GPA Change Distribution</div>
+          <div class="plot-desc">Histogram + KDE and burnout-stratified boxplot</div>
+        </div>
+      </div>
+      <div class="plot-card" onclick="openLightbox('assets/plot_ai_dependency_skill.png')">
+        <img src="assets/plot_ai_dependency_skill.png" alt="AI Dependency vs Skill Retention" loading="lazy">
+        <div class="plot-info">
+          <div class="plot-num">Plot 2</div>
+          <div class="plot-title">AI Dependency vs Skill Retention</div>
+          <div class="plot-desc">4,000-point scatter with trend + avg retention bar chart</div>
+        </div>
+      </div>
+      <div class="plot-card" onclick="openLightbox('assets/plot_genai_gpa_major.png')">
+        <img src="assets/plot_genai_gpa_major.png" alt="GenAI Hours vs GPA by Major" loading="lazy">
+        <div class="plot-info">
+          <div class="plot-num">Plot 3</div>
+          <div class="plot-title">GenAI Hours vs GPA by Major</div>
+          <div class="plot-desc">Regression scatter + grouped burnout count by major</div>
+        </div>
+      </div>
+      <div class="plot-card" onclick="openLightbox('assets/plot_correlation_heatmap.png')">
+        <img src="assets/plot_correlation_heatmap.png" alt="Feature Correlation Heatmap" loading="lazy">
+        <div class="plot-info">
+          <div class="plot-num">Plot 4</div>
+          <div class="plot-title">Feature Correlation Heatmap</div>
+          <div class="plot-desc">Lower-triangle Pearson correlation of all 12 numeric features</div>
+        </div>
+      </div>
+      <div class="plot-card" onclick="openLightbox('assets/plot_policy_analysis.png')">
+        <img src="assets/plot_policy_analysis.png" alt="Institutional Policy Impact" loading="lazy">
+        <div class="plot-info">
+          <div class="plot-num">Plot 5</div>
+          <div class="plot-title">Institutional Policy Impact</div>
+          <div class="plot-desc">AI-study ratio violin + exam anxiety grouped bar</div>
+        </div>
+      </div>
+      <div class="plot-card" onclick="openLightbox('assets/plot_confusion_matrices.png')">
+        <img src="assets/plot_confusion_matrices.png" alt="Confusion Matrices" loading="lazy">
+        <div class="plot-info">
+          <div class="plot-num">Plot 6</div>
+          <div class="plot-title">Confusion Matrices</div>
+          <div class="plot-desc">RF 51.87% vs LR 51.12% — both beat 42.3% baseline</div>
+        </div>
+      </div>
+      <div class="plot-card" onclick="openLightbox('assets/plot_feature_importance.png')">
+        <img src="assets/plot_feature_importance.png" alt="Feature Importance" loading="lazy">
+        <div class="plot-info">
+          <div class="plot-num">Plot 7</div>
+          <div class="plot-title">Feature Importance</div>
+          <div class="plot-desc">Top 15 RF importances colour-coded by tier</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── ML MODELS ────────────────────────────────────────────────────────── -->
+<section id="models">
+  <div class="container">
+    <h2 class="section-title fade-in">ML Model <span>Results</span></h2>
+    <p class="section-sub fade-in">Stratified 80/20 split · 5-fold cross-validation · class_weight='balanced'</p>
+
+    <div class="model-grid fade-in">
+      <div class="model-card best">
+        <div class="mc-label">✓ Best Model</div>
+        <div class="mc-name">Random Forest</div>
+        <div class="mc-acc green">51.87%</div>
+        <div class="mc-note">300 trees · unlimited depth · balanced</div>
+        <div class="mc-note" style="color:var(--green);font-weight:700;margin-top:6px">+9.6 pp above baseline</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" style="width:51.87%;background:var(--green)"></div></div>
+      </div>
+      <div class="model-card lr">
+        <div class="mc-label">Baseline Model</div>
+        <div class="mc-name">Logistic Regression</div>
+        <div class="mc-acc blue">51.12%</div>
+        <div class="mc-note">lbfgs solver · max_iter=1000 · scaled</div>
+        <div class="mc-note" style="color:#2980b9;font-weight:700;margin-top:6px">+8.8 pp above baseline</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" style="width:51.12%;background:#2980b9"></div></div>
+      </div>
+      <div class="model-card base">
+        <div class="mc-label">Naive Baseline</div>
+        <div class="mc-name">Majority Class</div>
+        <div class="mc-acc gray">42.29%</div>
+        <div class="mc-note">Always predicts "Medium"</div>
+        <div class="mc-note" style="color:#9ca3af;font-weight:700;margin-top:6px">No learning</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" style="width:42.29%;background:#9ca3af"></div></div>
+      </div>
+    </div>
+
+    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:24px;margin-top:28px" class="fade-in">
+      <h3 style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:16px">Top 6 Burnout Predictors (Random Forest)</h3>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:12px"><span style="font-size:13px;width:220px;font-weight:600;color:#374151">🕐 Weekly GenAI Hours</span><div style="flex:1;height:14px;background:#e5e7eb;border-radius:99px;overflow:hidden"><div style="width:100%;height:100%;background:var(--crimson);border-radius:99px"></div></div><span style="font-size:11px;width:40px;text-align:right;color:var(--muted)">100%</span></div>
+        <div style="display:flex;align-items:center;gap:12px"><span style="font-size:13px;width:220px;font-weight:600;color:#374151">⚖️ AI-to-Study Ratio</span><div style="flex:1;height:14px;background:#e5e7eb;border-radius:99px;overflow:hidden"><div style="width:82%;height:100%;background:var(--crimson);border-radius:99px"></div></div><span style="font-size:11px;width:40px;text-align:right;color:var(--muted)">82%</span></div>
+        <div style="display:flex;align-items:center;gap:12px"><span style="font-size:13px;width:220px;font-weight:600;color:#374151">🤖 Perceived AI Dependency</span><div style="flex:1;height:14px;background:#e5e7eb;border-radius:99px;overflow:hidden"><div style="width:68%;height:100%;background:var(--orange);border-radius:99px"></div></div><span style="font-size:11px;width:40px;text-align:right;color:var(--muted)">68%</span></div>
+        <div style="display:flex;align-items:center;gap:12px"><span style="font-size:13px;width:220px;font-weight:600;color:#374151">📐 Skill Efficiency</span><div style="flex:1;height:14px;background:#e5e7eb;border-radius:99px;overflow:hidden"><div style="width:62%;height:100%;background:var(--orange);border-radius:99px"></div></div><span style="font-size:11px;width:40px;text-align:right;color:var(--muted)">62%</span></div>
+        <div style="display:flex;align-items:center;gap:12px"><span style="font-size:13px;width:220px;font-weight:600;color:#374151">🚩 High AI Dependency (flag)</span><div style="flex:1;height:14px;background:#e5e7eb;border-radius:99px;overflow:hidden"><div style="width:51%;height:100%;background:#2980b9;border-radius:99px"></div></div><span style="font-size:11px;width:40px;text-align:right;color:var(--muted)">51%</span></div>
+        <div style="display:flex;align-items:center;gap:12px"><span style="font-size:13px;width:220px;font-weight:600;color:#374151">😰 Exam Anxiety Level</span><div style="flex:1;height:14px;background:#e5e7eb;border-radius:99px;overflow:hidden"><div style="width:41%;height:100%;background:#2980b9;border-radius:99px"></div></div><span style="font-size:11px;width:40px;text-align:right;color:var(--muted)">41%</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── INSIGHTS ─────────────────────────────────────────────────────────── -->
+<section id="insights">
+  <div class="container">
+    <h2 class="section-title fade-in">Key Analytical <span>Insights</span></h2>
+    <p class="section-sub fade-in">Derived from 50,000 student records across all 5 major categories</p>
+
+    <div class="insight-grid fade-in">
+      <div class="insight-card red">
+        <div class="i-emoji">📉</div>
+        <div class="i-title">GPA Change by Burnout Risk</div>
+        <div class="i-val">+0.196 vs +0.200</div>
+        <div class="i-desc">High-risk students show lower average GPA improvement (+0.196) compared to Low-risk (+0.200), confirming burnout suppresses academic performance.</div>
+      </div>
+      <div class="insight-card">
+        <div class="i-emoji">🤖</div>
+        <div class="i-title">AI Dependency vs Skill Retention</div>
+        <div class="i-val">r = −0.084</div>
+        <div class="i-desc">Weak negative correlation between perceived AI dependency and skill retention — higher dependency is consistently associated with lower retained learning.</div>
+      </div>
+      <div class="insight-card green">
+        <div class="i-emoji">✏️</div>
+        <div class="i-title">Prompt Skill is Protective</div>
+        <div class="i-val">Lower burnout rate</div>
+        <div class="i-desc">Advanced prompt engineers show a lower High-burnout rate than Beginners, demonstrating that skill quality mediates AI's psychological impact on students.</div>
+      </div>
+      <div class="insight-card orange">
+        <div class="i-emoji">⏰</div>
+        <div class="i-title">GenAI Hours vs GPA Change</div>
+        <div class="i-val">r = −0.047</div>
+        <div class="i-desc">Weak negative trend: more GenAI hours weakly correlates with lower GPA improvement. Traditional study hours remain a stronger positive predictor.</div>
+      </div>
+      <div class="insight-card">
+        <div class="i-emoji">🏫</div>
+        <div class="i-title">Policy Shapes Behaviour</div>
+        <div class="i-val">Allowed w/ Citation best</div>
+        <div class="i-desc">Actively-Encouraged policies produce widest AI-to-study variance. Strict bans don't reduce anxiety. Citation-based policies balance adoption and outcomes best.</div>
+      </div>
+      <div class="insight-card red">
+        <div class="i-emoji">🌲</div>
+        <div class="i-title">Random Forest Wins</div>
+        <div class="i-val">51.87% accuracy</div>
+        <div class="i-desc">RF beats both LR (51.12%) and the 42.3% majority-class baseline — confirming non-linear feature interactions that linear models miss.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── ETHICS ───────────────────────────────────────────────────────────── -->
+<section id="ethics">
+  <div class="container">
+    <h2 class="section-title fade-in">Ethical <span>Recommendations</span></h2>
+    <p class="section-sub fade-in">Responsible AI integration in educational institutions</p>
+
+    <div class="ethics-list fade-in">
+      <div class="ethics-item">
+        <div class="e-num">1</div>
+        <div><div class="e-title">🎓 Embed AI Literacy in Curricula</div><div class="e-desc">Prompt engineering and critical AI evaluation should be formal competencies in every academic programme — not optional extras. Students with better prompt skills show measurably better outcomes.</div></div>
+      </div>
+      <div class="ethics-item">
+        <div class="e-num">2</div>
+        <div><div class="e-title">⚖️ Adopt Citation-Based AI Policies</div><div class="e-desc">Blanket bans neither reduce anxiety nor improve GPA. Policies requiring students to cite and critically engage with AI output strike the best balance between adoption and academic integrity.</div></div>
+      </div>
+      <div class="ethics-item">
+        <div class="e-num">3</div>
+        <div><div class="e-title">🚨 Deploy Early-Warning Systems Responsibly</div><div class="e-desc">ML burnout predictors like the model in this project can flag at-risk students at mid-semester. Deployment must be transparent, voluntary, and governed by student data consent frameworks.</div></div>
+      </div>
+      <div class="ethics-item">
+        <div class="e-num">4</div>
+        <div><div class="e-title">📚 Preserve Traditional Study Time</div><div class="e-desc">Traditional study hours remain among the top predictors of GPA improvement. Institutions should ensure GenAI tools supplement — not replace — deep independent learning and problem-solving.</div></div>
+      </div>
+      <div class="ethics-item">
+        <div class="e-num">5</div>
+        <div><div class="e-title">🔒 Govern Student Data Transparently</div><div class="e-desc">Any deployment of AI behavioural analytics on students must follow data minimisation principles, obtain explicit consent, and provide opt-out options without academic penalty.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ───────────────────────────────────────────────────────────── -->
+<footer>
+  <div>
+    <strong>AI Impact on Students</strong> &nbsp;·&nbsp;
+    IBM SkillsBuild Data Analytics with AI Academic Internship &nbsp;·&nbsp;
+    BharatCares × AICTE
+  </div>
+  <div style="margin-top:8px;color:#6b7280">Author: <strong>Dharamveer Sharma</strong></div>
+  <div class="footer-links">
+    <a href="https://github.com/DharamveerSharma/IBM_Skillbuild_project" target="_blank">⭐ GitHub Repository</a>
+    <a href="DharamveerSharma_AI_Impact_Students.ipynb" download>📓 Download Notebook</a>
+    <a href="DharamveerSharma_ProjectReport.docx" download>📄 Project Report</a>
+    <a href="https://www.kaggle.com/datasets" target="_blank">📊 Dataset Source</a>
+  </div>
+  <div style="margin-top:20px;padding-top:16px;border-top:1px solid #21262d;font-size:11px;color:#484f58">
+    Made with IBM Bob &nbsp;·&nbsp; © 2024 Dharamveer Sharma
+  </div>
+</footer>
+
+<!-- ── LIGHTBOX ─────────────────────────────────────────────────────────── -->
+<div id="lightbox" onclick="closeLightbox()">
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<script>
+  /* ── Lightbox ─────────────────────────────────────────────────── */
+  function openLightbox(src) {
+    document.getElementById('lightbox-img').src = src;
+    document.getElementById('lightbox').classList.add('open');
+  }
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('open');
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+  /* ── Scroll fade-in animations ───────────────────────────────── */
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+  /* ── Animate progress bars on scroll ────────────────────────── */
+  const barObserver = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.querySelectorAll('.progress-bar').forEach(bar => {
+          const w = bar.style.width; bar.style.width = '0';
+          setTimeout(() => { bar.style.width = w; }, 100);
+        });
+      }
+    });
+  }, { threshold: 0.3 });
+  document.querySelectorAll('.model-card').forEach(el => barObserver.observe(el));
+</script>
+</body>
+</html>
